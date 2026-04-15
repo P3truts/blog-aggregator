@@ -11,7 +11,7 @@ export function setUser(currentUserName: string): void {
     config.currentUserName = currentUserName;
 
     const configPath = getConfigPath();
-    //console.log("configPath: " + configPath);
+    console.log("configPath: " + configPath);
     try {
         fs.writeFileSync(configPath, JSON.stringify(config));
     } catch (error: any) {
