@@ -1,1 +1,1 @@
-{"dbUrl":"postgres://example","currentUserName":"petrut", "dbConnString": "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"}
+{"dbUrl":"postgres://example","currentUserName":"kahya","dbConnString":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"}

@@ -1,16 +1,18 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 
 export type Config = {
     dbUrl: string,
-    currentUserName: string
+    currentUserName: string,
+    dbConnString: string
 }
 
-export function setUser(currentUserName: string): void {
-    const config = readConfig();
+export async function setUser(currentUserName: string): Promise<void> {
+    const config = await readConfig();
     config.currentUserName = currentUserName;
 
-    const configPath = getConfigPath();
+    const configPath = await getConfigPath();
     console.log("configPath: " + configPath);
     try {
         fs.writeFileSync(configPath, JSON.stringify(config));
@@ -19,8 +21,8 @@ export function setUser(currentUserName: string): void {
     }
 }
 
-export function readConfig(): Config {
-    const configPath = getConfigPath();
+export async function readConfig(): Promise<Config> {
+    const configPath = await getConfigPath();
 
     let jsonConfig = {};
     try {
@@ -34,8 +36,9 @@ export function readConfig(): Config {
     return jsonConfig as Config;
 }
 
-function getConfigPath(): string {
-    const homeDir = process.cwd();
+async function getConfigPath(): Promise<string> {
+    //const homeDir = process.cwd();
+    const homeDir = os.homedir();
 
     return path.join(homeDir, "./.gatorconfig.json");
 }
