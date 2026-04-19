@@ -1,5 +1,5 @@
 import { setUser } from "./config";
-import { createUser, getUserByName } from "./lib/db/queries/users";
+import { createUser, getUserByName, truncateTable } from "./lib/db/queries/users";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -34,6 +34,13 @@ export async function handlerRegister(cmdName: string, ...args: string[]): Promi
         console.log(`User ${user} has been registered!`);
     }
     setUser(username);
+}
+
+export async function handleReset(cmdName: string): Promise<void> {
+    console.log(`Executing ${cmdName}!`);
+
+    await truncateTable("users");
+    console.log(`Table users has been reset!`);
 }
 
 async function isUserRegistered(username: string): Promise<boolean> {

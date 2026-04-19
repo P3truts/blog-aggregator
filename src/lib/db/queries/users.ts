@@ -1,6 +1,6 @@
 import { db } from "..";
 import { users } from "../schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export async function createUser(name: string) {
     const [result] = await db.insert(users).values({ name: name }).returning();
@@ -9,5 +9,10 @@ export async function createUser(name: string) {
 
 export async function getUserByName(name: string) {
     const [result] = await db.select().from(users).where(eq(users.name, name));
+    return result;
+}
+
+export async function truncateTable(tableName: string) {
+    const [result] = await db.execute(sql.raw(`TRUNCATE TABLE ${tableName} CASCADE;`));
     return result;
 }

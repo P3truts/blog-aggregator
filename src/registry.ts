@@ -10,7 +10,11 @@ export async function registerCommand(registry: CommandsRegistry, cmdName: strin
 export async function runCommand(registry: CommandsRegistry, cmdName: string, ...args: string[]): Promise<void> {
     if (cmdName in registry && args.length > 0) {
         console.log(`Running command ${cmdName}...`);
-        await registry[cmdName](cmdName, args[0]);
+        if (cmdName === "reset") {
+            await registry[cmdName](cmdName);
+        } else {
+            await registry[cmdName](cmdName, args[0]);
+        }
         console.log("Command completed!");
     } else {
         console.log(`Command ${cmdName} or argument ${args[0]} incorrect. Please try again!`);
