@@ -1,5 +1,5 @@
-import { setUser } from "./config";
-import { createUser, getUserByName, truncateTable } from "./lib/db/queries/users";
+import { readConfig, setUser } from "./config";
+import { createUser, getUserByName, truncateTable, getUsers } from "./lib/db/queries/users";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -43,6 +43,20 @@ export async function handleReset(cmdName: string): Promise<void> {
     console.log(`Table users has been reset!`);
 }
 
+export async function handleUsers(cmdName: string) {
+    console.log(`Executing ${cmdName}!`);
+    const users = await getUsers();
+    const config = await readConfig();
+
+    for (const user of users) {
+        if (user.name === config.currentUserName) {
+            console.log("* " + user.name + " (current)");
+            continue;
+        }
+        console.log("* " + user.name);
+    }
+}
+
 async function isUserRegistered(username: string): Promise<boolean> {
     const user = await getUserByName(username);
     console.log(`isUserRegistered res: ${user}`);
@@ -50,3 +64,5 @@ async function isUserRegistered(username: string): Promise<boolean> {
     console.log(`User ${username} register status: ${isUser}.`);
     return isUser;
 }
+
+

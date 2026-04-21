@@ -16,3 +16,8 @@ export async function truncateTable(tableName: string) {
     const [result] = await db.execute(sql.raw(`TRUNCATE TABLE ${tableName} CASCADE;`));
     return result;
 }
+
+export async function getUsers() {
+    const result = await db.select().from(users);
+    return result;
+}

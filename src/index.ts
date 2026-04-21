@@ -1,6 +1,6 @@
 import { argv } from "node:process";
 import { readConfig } from "./config";
-import { handleReset, handlerLogin, handlerRegister } from "./handler";
+import { handleReset, handlerLogin, handlerRegister, handleUsers } from "./handler";
 import { CommandsRegistry, registerCommand, runCommand } from "./registry";
 
 async function main() {
@@ -11,6 +11,7 @@ async function main() {
     await registerCommand(registry, "login", handlerLogin);
     await registerCommand(registry, "register", handlerRegister);
     await registerCommand(registry, "reset", handleReset);
+    await registerCommand(registry, "users", handleUsers);
 
     let input: string = "";
     argv.forEach((val) => {
@@ -35,7 +36,7 @@ export async function executeInput(input: string, registry: CommandsRegistry): P
 
     const args = words.slice(2);
     if (words.length > 2 && args[0] in registry) {
-        if (args[1] || args[0] === "reset") {
+        if (args[1] || (args[0] === "reset" || args[0]) === "users") {
             await runCommand(registry, args[0], args[1]);
         } else {
             throw Error(`Unknown argument ${words[3]} for command ${words[2]}`);
