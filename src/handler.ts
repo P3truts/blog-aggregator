@@ -1,4 +1,5 @@
 import { readConfig, setUser } from "./config";
+import { fetchFeed } from "./feed";
 import { createUser, getUserByName, truncateTable, getUsers } from "./lib/db/queries/users";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
@@ -36,14 +37,14 @@ export async function handlerRegister(cmdName: string, ...args: string[]): Promi
     setUser(username);
 }
 
-export async function handleReset(cmdName: string): Promise<void> {
+export async function handlerReset(cmdName: string): Promise<void> {
     console.log(`Executing ${cmdName}!`);
 
     await truncateTable("users");
     console.log(`Table users has been reset!`);
 }
 
-export async function handleUsers(cmdName: string) {
+export async function handlerUsers(cmdName: string) {
     console.log(`Executing ${cmdName}!`);
     const users = await getUsers();
     const config = await readConfig();
@@ -55,6 +56,14 @@ export async function handleUsers(cmdName: string) {
         }
         console.log("* " + user.name);
     }
+}
+
+export async function handlerAgg(cmdName: string) {
+    console.log(`Executing ${cmdName}!`);
+    const feedURL = "https://www.wagslane.dev/index.xml";
+    const feed = await fetchFeed(feedURL);
+
+    console.log(feed);
 }
 
 async function isUserRegistered(username: string): Promise<boolean> {
