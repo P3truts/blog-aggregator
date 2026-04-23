@@ -8,6 +8,13 @@
       "when": 1776266479796,
       "tag": "0000_absurd_rawhide_kid",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776875811539,
+      "tag": "0001_loving_carlie_cooper",
+      "breakpoints": true
     }
   ]
 }

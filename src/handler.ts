@@ -1,6 +1,8 @@
 import { readConfig, setUser } from "./config";
 import { fetchFeed } from "./feed";
+import { createFeed } from "./lib/db/queries/feeds";
 import { createUser, getUserByName, truncateTable, getUsers } from "./lib/db/queries/users";
+import { feed, user } from "./lib/db/schema";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -66,6 +68,19 @@ export async function handlerAgg(cmdName: string) {
     console.log(feed);
 }
 
+export async function handlerFeed(cmdName: string, name: string, url: string) {
+    console.log(`Executing ${cmdName}!`);
+    const config = await readConfig();
+    const currentUser = await getUserByName(config.currentUserName);
+
+    if (name === undefined || url === undefined) {
+        throw Error("A feed name and url must be given!");
+    }
+    const feed = await createFeed(name, url, currentUser.id);
+    console.log(`The feed ${feed.name} has been created by user ${currentUser.name}!`);
+    printFeed(currentUser, feed);
+}
+
 async function isUserRegistered(username: string): Promise<boolean> {
     const user = await getUserByName(username);
     console.log(`isUserRegistered res: ${user}`);
@@ -74,4 +89,11 @@ async function isUserRegistered(username: string): Promise<boolean> {
     return isUser;
 }
 
+function printFeed(user: user, feed: feed) {
+    console.log("User fields: ");
+    console.log(user);
+
+    console.log("Feed fields: ");
+    console.log(feed);
+}
 

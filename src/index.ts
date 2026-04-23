@@ -1,6 +1,6 @@
 import { argv } from "node:process";
 import { readConfig } from "./config";
-import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg } from "./handler";
+import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed } from "./handler";
 import { CommandsRegistry, registerCommand, runCommand } from "./registry";
 
 async function main() {
@@ -13,10 +13,11 @@ async function main() {
     await registerCommand(registry, "reset", handlerReset);
     await registerCommand(registry, "users", handlerUsers);
     await registerCommand(registry, "agg", handlerAgg);
+    await registerCommand(registry, "addfeed", handlerFeed);
 
-    let input: string = "";
+    let input: string[] = [];
     argv.forEach((val) => {
-        input += val + " ";
+        input.push(val);
     });
     await executeInput(input, registry);
 
@@ -27,21 +28,22 @@ async function main() {
     process.exit(0);
 }
 
-export async function cleanInput(input: string): Promise<string[]> {
-    input = input.trim();
-    return input.toLowerCase().split(" ").filter(c => c !== "");
+export async function cleanInput(input: string[]): Promise<string[]> {
+    let cleanedInput: string[] = [];
+    for (const inp of input) {
+        let trimmedInp = inp.valueOf().trim();
+        cleanedInput.push(trimmedInp.toLowerCase());
+    }
+
+    return cleanedInput.slice(2);
 }
 
-export async function executeInput(input: string, registry: CommandsRegistry): Promise<void> {
-    let words = await cleanInput(input);
+export async function executeInput(input: string[], registry: CommandsRegistry): Promise<void> {
+    const args = await cleanInput(input);
 
-    const args = words.slice(2);
-    if (words.length > 2 && args[0] in registry) {
-        if (args[1] || (args[0] === "reset" || args[0]) === "users" || args[0] === "agg") {
-            await runCommand(registry, args[0], args[1]);
-        } else {
-            throw Error(`Unknown argument ${words[3]} for command ${words[2]}`);
-        }
+    if (args[0] in registry) {
+        const cmdArgs = args.slice(1);
+        await runCommand(registry, args[0], ...cmdArgs);
     } else {
         throw Error("Unknown command");
     }
