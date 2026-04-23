@@ -1,6 +1,6 @@
 import { argv } from "node:process";
 import { readConfig } from "./config";
-import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed } from "./handler";
+import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed, handlerFeeds } from "./handler";
 import { CommandsRegistry, registerCommand, runCommand } from "./registry";
 
 async function main() {
@@ -14,6 +14,7 @@ async function main() {
     await registerCommand(registry, "users", handlerUsers);
     await registerCommand(registry, "agg", handlerAgg);
     await registerCommand(registry, "addfeed", handlerFeed);
+    await registerCommand(registry, "feeds", handlerFeeds);
 
     let input: string[] = [];
     argv.forEach((val) => {
@@ -21,9 +22,9 @@ async function main() {
     });
     await executeInput(input, registry);
 
-    const config = await readConfig();
-    console.log("currentUserName: " + config.currentUserName);
-    console.log("dbUrl: " + config.dbUrl);
+    //const config = await readConfig();
+    //console.log("currentUserName: " + config.currentUserName);
+    //console.log("dbUrl: " + config.dbUrl);
 
     process.exit(0);
 }
@@ -32,7 +33,7 @@ export async function cleanInput(input: string[]): Promise<string[]> {
     let cleanedInput: string[] = [];
     for (const inp of input) {
         let trimmedInp = inp.valueOf().trim();
-        cleanedInput.push(trimmedInp.toLowerCase());
+        cleanedInput.push(trimmedInp);
     }
 
     return cleanedInput.slice(2);

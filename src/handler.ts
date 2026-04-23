@@ -1,7 +1,7 @@
 import { readConfig, setUser } from "./config";
 import { fetchFeed } from "./feed";
-import { createFeed } from "./lib/db/queries/feeds";
-import { createUser, getUserByName, truncateTable, getUsers } from "./lib/db/queries/users";
+import { createFeed, getFeeds } from "./lib/db/queries/feeds";
+import { createUser, getUserByName, truncateTable, getUsers, getUserById } from "./lib/db/queries/users";
 import { feed, user } from "./lib/db/schema";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
@@ -79,6 +79,19 @@ export async function handlerFeed(cmdName: string, name: string, url: string) {
     const feed = await createFeed(name, url, currentUser.id);
     console.log(`The feed ${feed.name} has been created by user ${currentUser.name}!`);
     printFeed(currentUser, feed);
+}
+
+export async function handlerFeeds(cmdName: string) {
+    console.log(`Executing ${cmdName}!`);
+    const feeds = await getFeeds();
+
+    for (const feed of feeds) {
+        console.log(feed.name);
+        console.log(feed.url);
+        const user = await getUserById(feed.user_id);
+        console.log(user.name);
+        console.log("=====");
+    }
 }
 
 async function isUserRegistered(username: string): Promise<boolean> {
