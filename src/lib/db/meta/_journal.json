@@ -15,6 +15,13 @@
       "when": 1776875811539,
       "tag": "0001_loving_carlie_cooper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777357424967,
+      "tag": "0002_fearless_fallen_one",
+      "breakpoints": true
     }
   ]
 }

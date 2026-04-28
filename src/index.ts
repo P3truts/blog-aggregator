@@ -1,6 +1,6 @@
 import { argv } from "node:process";
 import { readConfig } from "./config";
-import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed, handlerFeeds } from "./handler";
+import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed, handlerFeeds, handlerFollow, handlerFollowing } from "./handler";
 import { CommandsRegistry, registerCommand, runCommand } from "./registry";
 
 async function main() {
@@ -15,6 +15,8 @@ async function main() {
     await registerCommand(registry, "agg", handlerAgg);
     await registerCommand(registry, "addfeed", handlerFeed);
     await registerCommand(registry, "feeds", handlerFeeds);
+    await registerCommand(registry, "follow", handlerFollow);
+    await registerCommand(registry, "following", handlerFollowing);
 
     let input: string[] = [];
     argv.forEach((val) => {
