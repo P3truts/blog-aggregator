@@ -2,9 +2,10 @@ import { readConfig, setUser } from "./config";
 import { fetchFeed } from "./feed";
 import { createFeed, createFeedFollow, getFeedByUrl, getFeedFollowsForUser, getFeeds } from "./lib/db/queries/feeds";
 import { createUser, getUserByName, truncateTable, getUsers, getUserById } from "./lib/db/queries/users";
-import { feed, user } from "./lib/db/schema";
+import { Feed, User } from "./lib/db/schema";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
+
 
 export async function handlerLogin(cmdName: string, ...args: string[]): Promise<void> {
     console.log(`Executing ${cmdName}!`);
@@ -68,18 +69,13 @@ export async function handlerAgg(cmdName: string) {
     console.log(feed);
 }
 
-export async function handlerFeed(cmdName: string, name: string, url: string) {
+export async function handlerFeed(cmdName: string, user: User, name: string, url: string) {
     console.log(`Executing ${cmdName}!`);
-    const config = await readConfig();
-    const currentUser = await getUserByName(config.currentUserName);
 
-    if (name === undefined || url === undefined) {
-        throw Error("A feed name and url must be given!");
-    }
-    const feed = await createFeed(name, url, currentUser.id);
+    const feed = await createFeed(name, url, user.id);
     await createFeedFollow(feed.user_id, feed.id);
-    console.log(`The feed ${feed.name} has been created by user ${currentUser.name}!`);
-    printFeed(currentUser, feed);
+    console.log(`The feed ${feed.name} has been created by user ${user.name}!`);
+    printFeed(user, feed);
 }
 
 export async function handlerFeeds(cmdName: string) {
@@ -95,31 +91,20 @@ export async function handlerFeeds(cmdName: string) {
     }
 }
 
-export async function handlerFollow(cmdName: string, url: string) {
+export async function handlerFollow(cmdName: string, user: User, url: string) {
     console.log(`Executing ${cmdName}!`);
     console.log(url);
-    const config = await readConfig();
-    const currentUser = await getUserByName(config.currentUserName);
 
-    if (currentUser === undefined) {
-        throw Error(`The user ${config.currentUserName} is not registered!`);
-    }
     const feed = await getFeedByUrl(url);
     console.log(feed);
-    const followData = await createFeedFollow(currentUser.id, feed.id);
+    const followData = await createFeedFollow(user.id, feed.id);
     console.log(followData);
 }
 
-export async function handlerFollowing(cmdName: string) {
+export async function handlerFollowing(cmdName: string, user: User) {
     console.log(`Executing ${cmdName}!`);
-    const config = await readConfig();
-    const currentUser = await getUserByName(config.currentUserName);
 
-    if (currentUser === undefined) {
-        throw Error(`The user ${config.currentUserName} is not registered!`);
-    }
-
-    const feeds = await getFeedFollowsForUser(currentUser.id);
+    const feeds = await getFeedFollowsForUser(user.id);
     console.log(feeds);
 }
 
@@ -131,7 +116,7 @@ async function isUserRegistered(username: string): Promise<boolean> {
     return isUser;
 }
 
-function printFeed(user: user, feed: feed) {
+function printFeed(user: User, feed: Feed) {
     console.log("User fields: ");
     console.log(user);
 
