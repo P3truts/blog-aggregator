@@ -1,6 +1,6 @@
 import { argv } from "node:process";
 //import { readConfig } from "./config";
-import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed, handlerFeeds, handlerFollow, handlerFollowing } from "./handler";
+import { handlerReset, handlerLogin, handlerRegister, handlerUsers, handlerAgg, handlerFeed, handlerFeeds, handlerFollow, handlerFollowing, handlerUnfollow } from "./handler";
 import { CommandsRegistry, registerCommand, runCommand } from "./registry";
 import { middlewareLoggedIn } from "./middleware";
 
@@ -18,6 +18,7 @@ async function main() {
     await registerCommand(registry, "feeds", handlerFeeds);
     await registerCommand(registry, "follow", middlewareLoggedIn(handlerFollow));
     await registerCommand(registry, "following", middlewareLoggedIn(handlerFollowing));
+    await registerCommand(registry, "unfollow", middlewareLoggedIn(handlerUnfollow));
 
     let input: string[] = [];
     argv.forEach((val) => {
