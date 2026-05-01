@@ -1,6 +1,7 @@
 import { readConfig, setUser } from "./config";
 import { fetchFeed } from "./feed";
 import { createFeed, createFeedFollow, deleteFeedFollow, getFeedByUrl, getFeedFollowsForUser, getFeeds, getNextFeedToFetch, markFeedFetched } from "./lib/db/queries/feeds";
+import { createPost, getPostsForUser } from "./lib/db/queries/posts";
 import { createUser, getUserByName, truncateTable, getUsers, getUserById } from "./lib/db/queries/users";
 import { Feed, User } from "./lib/db/schema";
 
@@ -61,15 +62,15 @@ export async function handlerUsers(cmdName: string) {
     }
 }
 
-export async function handlerAgg(cmdName: string, time_between_reqs: string) {
+export async function handlerAgg(cmdName: string, user: User, time_between_reqs: string) {
     console.log(`Executing ${cmdName}!`);
     const parsedDuration = parseDuration(time_between_reqs);
     console.log(`Collecting feeds every ${time_between_reqs}`);
 
-    scrapeFeeds().catch();
+    scrapeFeeds(user).catch();
 
     const interval = setInterval(() => {
-        scrapeFeeds().catch();
+        scrapeFeeds(user).catch();
     }, parsedDuration);
 
     await new Promise<void>((resolve) => {
@@ -134,6 +135,17 @@ export async function handlerUnfollow(cmdName: string, user: User, url: string) 
     console.log(deletedData);
 }
 
+export async function handlerBrowse(cmdName: string, user: User, limit: number = 2) {
+    console.log(`Executing ${cmdName}!`);
+    const parsedLimit = Number(limit);
+    if (isNaN(parsedLimit) || parsedLimit < 1) {
+        throw Error("The nr. of posts must be a valid number greater than 0.");
+    }
+    const posts = await getPostsForUser(user.id, parsedLimit);
+
+    console.log(posts);
+}
+
 async function isUserRegistered(username: string): Promise<boolean> {
     const user = await getUserByName(username);
     console.log(`isUserRegistered res: ${user}`);
@@ -142,7 +154,7 @@ async function isUserRegistered(username: string): Promise<boolean> {
     return isUser;
 }
 
-async function scrapeFeeds() {
+async function scrapeFeeds(user: User) {
     const nextFeed = await getNextFeedToFetch();
     console.log("Next Feed:");
     console.log(nextFeed);
@@ -156,7 +168,9 @@ async function scrapeFeeds() {
     //console.log(retrievedFeed);
     console.log("Marked Feed items: ");
     for (const item of retrievedFeed) {
-        console.log(item);
+        const parsedDate = parseDate(item.pubDate);
+        await createPost(user.id, item.link, item.description, parsedDate, markedFeed.id)
+        console.log(item.title);
     }
 }
 
@@ -191,3 +205,11 @@ function parseDuration(durationStr: string) {
     }
 }
 
+function parseDate(date: string) {
+    const parsedDate = new Date(Date.parse(date));
+
+    if (isNaN(parsedDate.getTime())) {
+        throw Error(`Date ${date} could not be parsed!`);
+    }
+    return parsedDate;
+}

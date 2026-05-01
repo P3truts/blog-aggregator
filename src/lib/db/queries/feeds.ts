@@ -42,7 +42,7 @@ export async function markFeedFetched(feedId: string) {
 }
 
 export async function getNextFeedToFetch() {
-    const [result] = await db.select().from(feeds).orderBy(sql`${feeds.last_fetched_at} NULLS FIRST`);
+    const [result] = await db.select().from(feeds).orderBy(sql`${feeds.last_fetched_at} ASC NULLS FIRST`);
 
     return result;
 }
