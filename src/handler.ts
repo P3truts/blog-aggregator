@@ -201,7 +201,7 @@ function parseDuration(durationStr: string) {
             return num * 60 * 60 * 1000;
         }
     } else {
-        throw Error(`Duration ${durationStr} cannot be parsed. Try again!`);
+        throw Error(`Duration ${durationStr} cannot be parsed. Try again using the format: <1ms> for miliseconds, <1s> for seconds, <1m> for minutes and <1h> for hours. Recommend using at least several seconds to avoid overwhelming the RSS feeds server.`);
     }
 }
 

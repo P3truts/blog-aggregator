@@ -20,6 +20,7 @@ async function main() {
     await registerCommand(registry, "following", middlewareLoggedIn(handlerFollowing));
     await registerCommand(registry, "unfollow", middlewareLoggedIn(handlerUnfollow));
     await registerCommand(registry, "browse", middlewareLoggedIn(handlerBrowse));
+    await registerCommand(registry, "help", handlerHelp);
 
     let input: string[] = [];
     argv.forEach((val) => {
@@ -47,11 +48,22 @@ export async function cleanInput(input: string[]): Promise<string[]> {
 export async function executeInput(input: string[], registry: CommandsRegistry): Promise<void> {
     const args = await cleanInput(input);
 
-    if (args[0] in registry) {
+    if (args[0] === "help") {
+        handlerHelp("help", registry);
+    } else if (args[0] in registry) {
         const cmdArgs = args.slice(1);
         await runCommand(registry, args[0], ...cmdArgs);
     } else {
         throw Error("Unknown command");
+    }
+}
+
+async function handlerHelp(cmdName: string, registry: CommandsRegistry) {
+    console.log(`Executing command ${cmdName}!`);
+
+    console.log("Below a list of available commands:");
+    for (const cmd in registry) {
+        console.log(cmd);
     }
 }
 
